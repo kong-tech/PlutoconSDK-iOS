@@ -15,11 +15,13 @@ class MonitoringResult {
     internal func updateSensor(plutocon: Plutocon, position: Int) -> Plutocon? {
         guard scannedPlutocons.count > position else { return nil }
         let p = scannedPlutocons[position]
-        
         plutocon.updateInterval(oldLastSeenMillis: p.lastSeenMillis)
-        scannedPlutocons[position] = plutocon
         
-        return plutocon
+        if plutocon.interval > 50 {
+            scannedPlutocons[position] = plutocon
+            return plutocon
+        }
+        return nil
     }
     
     internal func addSensor(plutocon: Plutocon) {
