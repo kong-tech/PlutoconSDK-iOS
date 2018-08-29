@@ -35,7 +35,7 @@ public class PlutoconEditor: NSObject {
         let slatitude: String = (isLatitudeNegative ? "1" : "0") + String(format: "%03d%06d", Int(latitude), Int(((latitude - Double(Int(latitude))) * 1000000)));
         let slongitude: String = (isLongitudeNegative ? "1" : "0") + String(format: "%03d%06d", Int(longitude), Int(((longitude - Double(Int(longitude))) * 1000000)));
         
-        uuid = uuid.subString(start:0, end: 9) + "-" + slatitude.subString(start: 0, end: 4) + "-" + uuid.subString(start: 12, end: uuid.count)
+        uuid = uuid.subString(start:0, end: 8) + "-" + slatitude.subString(start: 0, end: 4) + "-" + uuid.subString(start: 12, end: uuid.count)
         uuid = uuid.subString(start: 0, end: 14) + slatitude.subString(start: 4, end: 8) + "-" + uuid.subString(start: 18, end: uuid.count)
         uuid = uuid.subString(start: 0, end: 19) + slatitude.subString(start: 8, end: 10) + uuid.subString(start: 21, end: uuid.count)
         

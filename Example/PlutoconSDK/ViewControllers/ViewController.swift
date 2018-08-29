@@ -78,6 +78,7 @@ extension ViewController: PlutoconManagerDelegate {
      * 스캔된 plutocon과 지금까지 스캔된 plutocons
      */
     func plutoconManager(_ manager: PlutoconManager, didDiscover plutocon: Plutocon, plutocons: [Plutocon]) {
+        print(plutocon.latitude)
         self.scannedPlutocons = plutocons
         self.tableView.reloadData()
     }
