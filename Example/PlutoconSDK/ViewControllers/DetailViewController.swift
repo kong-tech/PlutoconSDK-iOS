@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreBluetooth
+import PlutoconSDK
 
 class DetailViewController: UIViewController {
 

@@ -11,6 +11,7 @@ import CoreBluetooth
 
 public class Plutocon: Equatable {
     internal static let SERVICE_DATA_UUID = CBUUID(string: "0000180a-0000-1000-8000-00805f9b34fb")
+    internal static let DEVICE_INFORMATION_UUID = CBUUID(string: "180A")
     
     public var peripheral: CBPeripheral?
     
@@ -84,8 +85,12 @@ public class Plutocon: Equatable {
         }
         self.macAddress = macString
         
-        let uuidArr = manufacturerData[4..<20]
-        self.uuid = CBUUID(data: Data(bytes: uuidArr))
+        if manufacturerData.count < 19 {
+            self.uuid = nil
+        } else {
+            let uuidArr = manufacturerData[4..<20]
+            self.uuid = CBUUID(data: Data(bytes: uuidArr))
+        }
         
         self.major = Int(UInt16(manufacturerData[20] & 0xff) << 8 | UInt16(manufacturerData[21] & 0xff))
         self.minor = Int(UInt16(manufacturerData[22] & 0xff) << 8 | UInt16(manufacturerData[23] & 0xff))
@@ -99,6 +104,56 @@ public class Plutocon: Equatable {
         self.isCertification = isCertification
         self.isMonitoring = isCertification
     }
+    
+    public init?(peripheral: CBPeripheral, advertisementData: [String:Any], rssi: NSNumber) {
+        guard let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String,
+            let advManufacturer = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data,
+            let advService = (advertisementData[CBAdvertisementDataServiceDataKey] as? NSDictionary)?[Plutocon.DEVICE_INFORMATION_UUID] as? Data
+            else { return nil }
+        
+        var serviceDataArr = [UInt8](repeating: 0, count: advService.count)
+        advService.copyBytes(to: &serviceDataArr, count: serviceDataArr.count)
+        
+        var manufacturerDataArr = [UInt8](repeating: 0, count: advManufacturer.count)
+        advManufacturer.copyBytes(to: &manufacturerDataArr, count: manufacturerDataArr.count)
+        
+        guard serviceDataArr.count >= 10, serviceDataArr[0] == 0x01, manufacturerDataArr.count >= 24 else {
+            return nil
+        }
+        
+        let battery = Int(UInt16(serviceDataArr[8]) << 8 | UInt16(serviceDataArr[9] & 0xff))
+        
+        
+        self.peripheral = peripheral
+        
+        self.name = name
+        
+        var macString = ""
+        for num in 2 ..< 8 {
+            macString.append(String(format: "%02X", serviceDataArr[num]))
+            if num != 7 {
+                macString.append(":")
+            }
+        }
+        self.macAddress = macString
+        
+        let uuidArr = manufacturerDataArr[4..<20]
+        self.uuid = CBUUID(data: Data(bytes: uuidArr))
+        
+        self.major = Int(UInt16(manufacturerDataArr[20] & 0xff) << 8 | UInt16(manufacturerDataArr[21] & 0xff))
+        self.minor = Int(UInt16(manufacturerDataArr[22] & 0xff) << 8 | UInt16(manufacturerDataArr[23] & 0xff))
+        
+        self.rssi = (rssi as? Int) ?? -100
+        self.interval = 0
+        self.lastSeenMillis = Date().timeIntervalSince1970
+        
+        self.battery = battery
+        
+        self.isCertification = true
+        self.isMonitoring = true
+    }
+    
+    
     
     public func setiBeacon(uuid: CBUUID, major: Int, minor: Int) {
         self.uuid = uuid
@@ -115,10 +170,10 @@ public class Plutocon: Equatable {
         isMonitoring = false
     }
     
-    internal static func createFromScanResult(peripheral: CBPeripheral, advertisementData: [String:Any], rssi: NSNumber) -> Plutocon? {
+    public static func createFromScanResult(peripheral: CBPeripheral, advertisementData: [String:Any], rssi: NSNumber) -> Plutocon? {
         guard let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String,
             let advManufacturer = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data,
-            let advService = (advertisementData[CBAdvertisementDataServiceDataKey] as? NSDictionary)?.allValues[0] as? Data
+            let advService = (advertisementData[CBAdvertisementDataServiceDataKey] as? NSDictionary)?[Plutocon.DEVICE_INFORMATION_UUID] as? Data
             else { return nil }
         
         var serviceDataArr = [UInt8](repeating: 0, count: advService.count)
@@ -127,7 +182,7 @@ public class Plutocon: Equatable {
         var manufacturerDataArr = [UInt8](repeating: 0, count: advManufacturer.count)
         advManufacturer.copyBytes(to: &manufacturerDataArr, count: manufacturerDataArr.count)
         
-        if serviceDataArr.count < 1, serviceDataArr[0] != 0x01 { return nil }
+        if serviceDataArr.count < 10, serviceDataArr[0] != 0x01, manufacturerDataArr.count >= 24 { return nil }
         
         let battery = Int(UInt16(serviceDataArr[8]) << 8 | UInt16(serviceDataArr[9] & 0xff))
         

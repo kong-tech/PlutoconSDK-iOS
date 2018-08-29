@@ -61,7 +61,7 @@ public class PlutoconManager: NSObject {
         self.isMonitoring = isMonitoring
         self.monitoringResult.removeAll()
         
-        self.centralManager?.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey : isMonitoring])
+        self.centralManager?.scanForPeripherals(withServices: [Plutocon.SERVICE_DATA_UUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey : isMonitoring])
     }
     
     public func stopScan() {
@@ -87,7 +87,7 @@ extension PlutoconManager: CBCentralManagerDelegate {
     
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         guard (RSSI as! Int) < 0 else { return }
-        guard let plutocon = Plutocon.createFromScanResult(peripheral: peripheral, advertisementData: advertisementData, rssi: RSSI) else { return }
+        guard let plutocon = Plutocon(peripheral: peripheral, advertisementData: advertisementData, rssi: RSSI) else { return }
         
         if let p = monitoringResult.index(of: plutocon) {
             if let plutocon = self.monitoringResult.updateSensor(plutocon: plutocon, position: p) {
