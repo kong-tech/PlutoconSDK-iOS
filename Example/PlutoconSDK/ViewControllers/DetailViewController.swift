@@ -114,15 +114,15 @@ class DetailViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        if isMovingFromParentViewController {
+        if isMovingFromParent {
             self.plutoconConnection?.disconnect()
         }
     }
     
     fileprivate func makeEditAlert(title: String, value: String, completion: @escaping ((String)->Void)) -> UIAlertController {
-        let alert = UIAlertController(title: title, message: nil, preferredStyle: UIAlertControllerStyle.alert)
+        let alert = UIAlertController(title: title, message: nil, preferredStyle: UIAlertController.Style.alert)
         
-        let action = UIAlertAction(title: "확인", style: UIAlertActionStyle.default) { (action) in
+        let action = UIAlertAction(title: "확인", style: UIAlertAction.Style.default) { (action) in
             if (alert.textFields?.count ?? 0) > 0 {
                 let text = alert.textFields?.first?.text ?? ""
                 if text != "" {
@@ -130,7 +130,7 @@ class DetailViewController: UIViewController {
                 }
             }
         }
-        let cancel = UIAlertAction(title: "취소", style: UIAlertActionStyle.cancel, handler: nil)
+        let cancel = UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel, handler: nil)
         alert.addAction(cancel)
         alert.addAction(action)
         

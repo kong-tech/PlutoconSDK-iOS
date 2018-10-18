@@ -69,8 +69,8 @@ public class PlutoconEditor: NSObject {
     
     public func setProperty(uuid: CBUUID, int value: Int) -> PlutoconEditor {
         var d = [UInt8](repeating: 0, count: 2)
-        let v = Int16(value)
-        d[0] = UInt8(bitPattern: Int8(v >> 8))
+        let v = UInt16(clamping: value)
+        d[0] = UInt8(v >> 8)
         d[1] = UInt8(v & 0xFF)
         
         self.operationList.append((uuid,Data(bytes: d)))

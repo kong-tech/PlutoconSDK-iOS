@@ -28,7 +28,7 @@ class ViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        refreshControl.addTarget(self, action: #selector(refreshControlValueChanged), for: UIControlEvents.valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshControlValueChanged), for: UIControl.Event.valueChanged)
         tableView.refreshControl = refreshControl
         
         
@@ -97,7 +97,7 @@ extension ViewController: PlutoconConnectionDelegate {
         self.connectingIndex = nil
         
         if let tempIndex = tempIndex {
-            self.tableView.reloadRows(at: [tempIndex], with: UITableViewRowAnimation.none)
+            self.tableView.reloadRows(at: [tempIndex], with: UITableView.RowAnimation.none)
         }
         performSegue(withIdentifier: "goDetailSegue", sender: nil)
     }
@@ -145,7 +145,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         connectingIndex = indexPath
         
         self.plutoconManager?.stopScan()
-        self.tableView.reloadRows(at: [indexPath], with: UITableViewRowAnimation.none)
+        self.tableView.reloadRows(at: [indexPath], with: UITableView.RowAnimation.none)
         
         /* Cell이 선택되면 해당 Plutocon에 연결을 시도하고 PlutoconConnection을 통해서 Plutocon의 데이터를 변경, 조회 함 */
         self.plutoconConnection = self.plutoconManager?.connect(connectionDelegate: self, target: self.scannedPlutocons[indexPath.row])
