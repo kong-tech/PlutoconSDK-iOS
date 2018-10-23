@@ -101,7 +101,7 @@ public class PlutoconConnection: NSObject {
     }
     
     public func editor() -> PlutoconEditor {
-        plutoconEditor = PlutoconEditor(delegate: self)
+        plutoconEditor = PlutoconEditor(delegate: self, plutoconConnection: self)
         return plutoconEditor!
     }
 }

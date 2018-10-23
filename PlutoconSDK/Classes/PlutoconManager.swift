@@ -35,7 +35,7 @@ typealias PlutoconScanCompletion = (Plutocon, [Plutocon]) -> Void
 public class PlutoconManager: NSObject {
     
     private var centralManager: CBCentralManager?
-    internal var delegate: PlutoconManagerDelegate?
+    public var delegate: PlutoconManagerDelegate?
     
     internal var monitoringResult = MonitoringResult()
     
