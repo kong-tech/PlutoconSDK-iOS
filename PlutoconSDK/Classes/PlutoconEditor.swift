@@ -122,8 +122,10 @@ public class PlutoconEditor: NSObject {
     
     /**
      * UUID 변경은 00000000-0000-0000-0000-000000000000 포맷과 일치해야 값을 변경합니다.
+     * Data is not UUID format. (00000000-0000-0000-0000-000000000000)
      *
-     * Device Name 변경은 1자리 이상 16자리 이하여야 변경합니다.
+     * Device Name 변경은 1자리 이상 14자리 이하여야 변경합니다.
+     * The device name must be between 1 and 14 characters long.
      */
     public func setProperty(uuid: CBUUID, string value: String) -> PlutoconEditor {
         if uuid == PlutoconUUID.UUID_CHARACTERISTIC {
@@ -134,8 +136,8 @@ public class PlutoconEditor: NSObject {
             return self
         }
         else if uuid == PlutoconUUID.DEVICE_NAME_CHARACTERISTIC {
-            guard value.count >= 1, value.count <= 16 else {
-                fatalError("The device name must be between 1 and 16 characters long.")
+            guard value.count >= 1, value.count <= 14 else {
+                fatalError("The device name must be between 1 and 14 characters long.")
             }
         }
         
